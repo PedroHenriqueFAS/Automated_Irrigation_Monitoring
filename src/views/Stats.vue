@@ -122,49 +122,47 @@ export default {
     }
     
   },
-  methods:{
-     getValues(){
-      const dados= ref(db)
-        onValue(dados,(snapshot)=>{
-      let dados =JSON.parse(JSON.stringify(snapshot.val().UsersData.readings));
-      const vector= (Object.entries(dados)).slice(-7);
-      const last_reading = (Object.entries(dados)).slice(-1);
-        this.leituras = vector;
-        this.Ground_Temperature=last_reading[0][1].soilTemp;
-        this.Ground_Humidity=Math.round(((last_reading[0][1].moistureHum)/1024)*100);
-        this.Air_Temperature=last_reading[0][1].airTemp;
-        this.Air_Humidity=last_reading[0][1].airHum;
-        // this.Ground_Temperature=35
-        // this.Ground_Humidity=60;
-        // this.Air_Temperature=34;
-        // this.Air_Humidity=75;
-    //airHum: ' 0 ', airTemp: '', moistureHum: '19.1 ', timestamp: '1677596930'
-      //console.log(vector)
-      console.log(this.leituras)
-      console.log(last_reading[0][1].soilTemp)
+
+  methods: {
+  getValues() {
+    const dados = ref(db, 'UsersData/readings');
+    onValue(dados, (snapshot) => {
+      const readings = snapshot.val();
+      const lastReading = Object.values(readings).pop(); // Obtém a última leitura
+
+      if (lastReading) {
+        this.Ground_Temperature = lastReading.soilTemp || 'N/A';
+        this.Ground_Humidity = Math.round((lastReading.moistureHum / 1024) * 100) || 'N/A';
+        this.Air_Temperature = lastReading.airTemp || 'N/A';
+        this.Air_Humidity = lastReading.airHum || 'N/A';
+      }
+    });
+  },
+},
+
+//   methods:{
+//      getValues(){
+//       const dados= ref(db)
+//         onValue(dados,(snapshot)=>{
+//       let dados =JSON.parse(JSON.stringify(snapshot.val().UsersData.readings));
+//       const vector= (Object.entries(dados)).slice(-7);
+//       const last_reading = (Object.entries(dados)).slice(-1);
+//         this.leituras = vector;
+//         this.Ground_Temperature=last_reading[0][1].soilTemp;
+//         this.Ground_Humidity=Math.round(((last_reading[0][1].moistureHum)/1024)*100);
+//         this.Air_Temperature=last_reading[0][1].airTemp;
+//         this.Air_Humidity=last_reading[0][1].airHum;
+//       console.log(this.leituras)
+//       console.log(last_reading[0][1].soilTemp)
       
      
 
-      //this.leituras= JSON.parse(JSON.stringify(snapshot.val().UsersData));
-     // console.log(dados)
-      //console.log(typeof(dados))
-
-      // console.log(this.leituras.readings[2])
-       //console.log(this.leituras['readings'])
-      //console.log(data)
-      // console.log(data.air_humidity)
-      // get(child(dados,`stats/`)).then((snapshot) => {
-      //   if(snapshot.exists()){
-      //     console.log(snapshot.val())
-      //   }else{
-      //     console.log("não existe")
-      //   }
-      // })
-    })
       
-    }
+//     })
+      
+//     }
 
-  },
+//   },
   created(){
 
     
