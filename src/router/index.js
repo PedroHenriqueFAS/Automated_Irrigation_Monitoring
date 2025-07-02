@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Stats from '../views/Stats.vue'
+import Stats02 from '../views/Stats02.vue'
+import Stats03 from '../views/Stats03.vue'
 import Config from '../views/Config.vue'
 import CatalogSheet from '../views/CatalogSheet.vue'
 import Sources from '../views/Sources.vue'
@@ -27,6 +29,16 @@ const routes = [
     path: '/stats',
     name: 'stats',
     component: Stats
+  },
+  {
+    path: '/stats02',
+    name: 'stats02',
+    component: Stats02
+  },
+  {
+    path: '/stats03',
+    name: 'stats03',
+    component: Stats03
   },
   {
     path: '/catalog',
