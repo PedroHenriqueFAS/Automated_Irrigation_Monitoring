@@ -6,9 +6,20 @@
                 <!-- <NavBar/> -->
             </div>
            <div class="plant-button-container">
-               <button class="plant-button" @click="goToStats()">Pimentão</button>
+               <button class="plant-button" @click="goToStats('stats')">Rua 1</button>
                <button class="plant-config-button" @click="goToConfig()"><font-awesome-icon icon="fa-solid fa-gear" /></button>
            </div>
+
+           <div class="plant-button-container">
+               <button class="plant-button" @click="goToStats('stats02')">Rua 2</button>
+               <button class="plant-config-button" @click="goToConfig()"><font-awesome-icon icon="fa-solid fa-gear" /></button>
+           </div>
+
+           <div class="plant-button-container">
+               <button class="plant-button" @click="goToStats('stats03')">Rua 3</button>
+               <button class="plant-config-button" @click="goToConfig()"><font-awesome-icon icon="fa-solid fa-gear" /></button>
+           </div>
+
        </div>
     </div>
 </template>
@@ -23,8 +34,8 @@ export default {
     NavBar
 },
     methods: {
-        goToStats(){
-            this.$router.push("/stats")
+        goToStats(statsPage){
+            this.$router.push("/" + statsPage)
         },
         goToConfig(){
             this.$router.push("/config")
