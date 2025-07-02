@@ -95,6 +95,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-x: hidden;
 }
 #app{
   height: 100%;
