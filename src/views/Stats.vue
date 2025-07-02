@@ -1,25 +1,29 @@
 <template>
-    <div class="main">
-      <Header :Title="title"/> 
+    <div class="main">  
+      <Header :Title="title" :subTitle="subtitle"/> 
         <div class="content">
+            <div class="air-humidity-stat">
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
+                    <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
+                </div>
           <div class="stats-container">
                 <div class="ground-temp-stat">                    
-                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura</p>
+                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Válvula</p>
                     <p class="ground-temp-stat-value">{{Ground_Temperature}} °C</p>
                 </div>
 
                 <div class="ground-humidity-stat">
-                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade</p>
+                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Fluxo</p>
                     <p class="ground-humidity-stat-value">{{Ground_Humidity}} %</p>
                 </div>
 
                 <div class="air-temp-stat">
-                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temp Ambiente</p>
+                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura</p>
                     <p class="air-temp-stat-value">{{ Air_Temperature }} °C</p>
                 </div>
 
                 <div class="air-humidity-stat">
-                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade</p>
                     <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
 
                 </div>
@@ -66,6 +70,7 @@ export default {
    data(){
         return{
             title:"Pimentão",
+            subtitle: "Rua 1",
             Stats_Vector:[15,16,17,18,19,19,16],
             computed: {
             myStyles () {
@@ -178,15 +183,15 @@ export default {
     //     this.Air_Humidity=snapshot.val().stats.air_humidity;
     //     console.log(data)
     // })
-},
-    
-  
-  
+},   
+ 
 }
 </script>
+
 <style scoped>
 
 .content{
+    padding-top: 5vh;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -196,23 +201,26 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap; /* Adicione esta linha */
 }
 .ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-end;
+    justify-content: space-between;
+    align-items: stretch; /* Permite alinhar label à esquerda e valor à direita */
     margin: 1rem;
     background-color: #064B15;
     border-radius: 40px;
     width: 20vw;
     height: 18vh;
     color: #fff;
+    padding: 0.5rem 1rem;
+    margin-bottom: 2rem
 }
 .ground-temp-stat-label,.air-temp-stat-label,.air-humidity-stat-label,.ground-humidity-stat-label{
-    font-size: 2.5vw;
-    padding: 0;
-    margin: 0rem 1rem 0rem 1rem;
+    font-size: 2vw;
+    margin: 0rem 1rem 0rem 1rem ;
+   
 }
 
 .air-temp-stat-label,.air-humidity-stat-label{
@@ -221,8 +229,9 @@ export default {
 }
 .ground-temp-stat-value,.air-temp-stat-value,.air-humidity-stat-value,.ground-humidity-stat-value{
     font-size: 2rem;
-    margin: 1rem 1rem 1rem 1rem;
-    
+    margin: 0rem ;
+    text-align: right;
+    max-width: 95%; /* Garante que o valor ocupe toda a largura do card */
 }
 
 .graph-stats{
@@ -230,6 +239,7 @@ export default {
     justify-content: center;
     height: 30vw;
     width: 70vw;
+    margin-bottom: 3rem
 }
 
 @media screen and (max-width: 600px) {
@@ -259,7 +269,8 @@ export default {
     display: flex;
     justify-content: center;
     height: 50vw;
-    width: 100vw;
+    width: 100%;
+    margin-bottom: 1.5rem; /* <-- espaçamento após o gráfico */
 }
 
 }
