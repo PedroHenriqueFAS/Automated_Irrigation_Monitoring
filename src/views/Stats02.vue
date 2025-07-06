@@ -195,7 +195,7 @@ Ground_Temperature: "--",
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Adicione esta linha */
+    flex-wrap: wrap; 
 }
 .ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
     display: flex;
@@ -225,7 +225,7 @@ Ground_Temperature: "--",
     font-size: 2rem;
     margin: 0rem ;
     text-align: right;
-    max-width: 95%; /* Garante que o valor ocupe toda a largura do card */
+    max-width: 95%; 
 }
 
 .graph-stats{
@@ -264,7 +264,7 @@ Ground_Temperature: "--",
     justify-content: center;
     height: 50vw;
     width: 100%;
-    margin-bottom: 1.5rem; /* <-- espaçamento após o gráfico */
+    margin-bottom: 1.5rem; 
 }
 
 }
