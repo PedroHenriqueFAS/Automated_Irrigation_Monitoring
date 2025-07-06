@@ -77,8 +77,6 @@
 // });
 
 
-
-
 // Importações
 const { SerialPort } = require('serialport');
 const { DelimiterParser } = require('@serialport/parser-delimiter');
@@ -89,7 +87,7 @@ const { ref, set } = require('firebase/database');
 
 // --- Configuração da Porta Serial ---
 const porta = new SerialPort({
-  path: 'COM4', // Ajustado para a porta da sua imagem
+  path: 'COM4', // Ajustado para a porta correta
   baudRate: 9600,
 });
 
