@@ -2,150 +2,184 @@
     <div class="main">  
       <Header :Title="title" :subTitle="subtitle"/> 
         <div class="content">
-            <div class="air-humidity-stat">
-                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
-                    <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
-                </div>
           <div class="stats-container">
-                <div class="ground-temp-stat">                    
-                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Válvula</p>
+                  <div class="ground-temp-stat">                    
+                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Solo</p>
                     <p class="ground-temp-stat-value">{{Ground_Temperature}} °C</p>
                 </div>
 
                 <div class="ground-humidity-stat">
-                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Fluxo</p>
+                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Solo</p>
                     <p class="ground-humidity-stat-value">{{Ground_Humidity}} %</p>
                 </div>
 
                 <div class="air-temp-stat">
-                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura</p>
+                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Ambiente</p>
                     <p class="air-temp-stat-value">{{ Air_Temperature }} °C</p>
                 </div>
 
                 <div class="air-humidity-stat">
-                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade</p>
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
                     <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
-
                 </div>
           </div>
           <div class="graph-stats">
-              <Line :data="data" :options="options"  />
+              <Line :data="chartData" :options="chartOptions"  />
           </div>
           
         </div>
    </div>
 </template>
 <script>
+
 import Header from "../components/Header.vue"
 import { auth } from '../firebase/index.js'
-import { ref, onValue} from "firebase/database";
-import {db} from "@/firebase/index.js"
+import { ref, onValue, query, orderByChild, limitToLast } from "firebase/database";
+import { db } from "@/firebase/index.js"
 
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  BarElement,
+  PointElement,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+} from 'chart.js'
+import { Line } from 'vue-chartjs'
+
+ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-} from 'chart.js'
-
-import { Bar } from 'vue-chartjs'
-import { Line } from 'vue-chartjs'
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
-  PointElement,
-  LineElement,)
+  Title,
+  Tooltip,
+  Legend
+)
 
 export default {
-   components:{
-       Header,
-       Bar,
-       Line
-   },
-   
-   data(){
-        return{
-            title:"Pimentão",
-            subtitle: "Rua 2",
-            Stats_Vector:[15,16,17,18,19,19,16],
-            computed: {
-            myStyles () {
-                return {
-                    height: "50vh",
-                    width:"70vw"
-                }
-            },
-            
-            },
+  components: {
+    Header,
+    Line
+  },
 
-            data: {
-            labels: ['Domingo','Segunda', 'Terça-Feira', 'Quarta-Feira','Quinta-Feira','Sexta-Feira','Sabado'],
-            datasets: [
-                { data: [25, 27, 24, 28, 27, 22, 25],
-                label:'Temperatura do Solo',
-                backgroundColor: 'rgba(255, 0, 0, 100)',
-                borderColor: 'rgba(255, 0, 0, 100)',
-                },
-                { data: [77, 65, 73, 71, 69, 67,70],
-                    label:'Umidade do Solo',
-                    backgroundColor: 'rgba(0, 255, 0, 100)',
-                    borderColor: 'rgba(0, 255, 0, 100)', 
-                },
-                { data: [25, 26, 28, 27, 24,26,25],
-                label:'Temperatura Ambiente',
-                backgroundColor: 'rgba(0, 0, 255, 100)',
-                borderColor: 'rgba(0, 0, 255, 100)'
-                },
-                { data: [68, 70, 49, 59, 60, 55, 50],
-                    label:'Umidade Ambiente',
-                    backgroundColor: 'rgba(0, 255, 255, 100)',
-                    borderColor: 'rgba(0, 255, 255, 100)', 
-                },
-                ],
-                
-            },
+  data() {
+    return {
+      title: "Pimentão",
+      subtitle: "Rua 2", 
+Ground_Temperature: "--",
+      Ground_Humidity: "--",
+      Air_Temperature: "--",
+      Air_Humidity: "--",
+      soilReadings: null,
+      ambientReadings: null,
+      chartData: {
+        labels: [],
+        datasets: [
+          { label: 'Temperatura do Solo (°C)', data: [], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)' },
+          { label: 'Umidade do Solo', data: [], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)' },
+          { label: 'Temperatura Ambiente (°C)', data: [], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)' },
+          { label: 'Umidade Ambiente (%)', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)' }
+        ],
+      },
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    };
+  },
 
-            options: {
-                responsive: true,
-            },
-
-            Ground_Temperature:"19.32",
-            Ground_Humidity:"45",
-            Air_Temperature:"20.31",
-            Air_Humidity:"60",
-            Stats_Vector:[15,16,17,18,19,19,16],
-        }
-    },
-    mounted(){
-    this.getValues()
-    if(auth.currentUser){
-      console.log("logado")
-    }
-    
+  mounted() {
+    console.log("Componente montado. Iniciando ouvintes do Firebase...");
+    this.listenToAmbientNode();
+    this.listenToSoilNode('Node2');
   },
 
   methods: {
-  getValues() {
-    const dados = ref(db, 'UsersData/readings');
-    onValue(dados, (snapshot) => {
-      const readings = snapshot.val();
-      const lastReading = Object.values(readings).pop(); // Obtém a última leitura
+    listenToAmbientNode() {
+      const dbRef = ref(db, 'UsersData/Node4/readings');
+      const recentReadingsQuery = query(dbRef, orderByChild('timestamp'), limitToLast(20));
+      onValue(recentReadingsQuery, (snapshot) => {
+        console.log("Recebido callback do NÓ DE AMBIENTE (Node 4).");
+        const readings = snapshot.val();
+        if (readings) {
+          this.ambientReadings = Object.values(readings);
+          this.updateChart();
+        } else {
+          console.warn("Nenhum dado encontrado para o Nó de Ambiente.");
+        }
+      });
+    },
 
-      if (lastReading) {
-        this.Ground_Temperature = lastReading.soilTemp || 'N/A';
-        this.Ground_Humidity = Math.round((lastReading.moistureHum / 1024) * 100) || 'N/A';
-        this.Air_Temperature = lastReading.airTemp || 'N/A';
-        this.Air_Humidity = lastReading.airHum || 'N/A';
+    listenToSoilNode(nodeId) {
+      const dbRef = ref(db, `UsersData/${nodeId}/readings`);
+      const recentReadingsQuery = query(dbRef, orderByChild('timestamp'), limitToLast(20));
+      onValue(recentReadingsQuery, (snapshot) => {
+        console.log(`Recebido callback do NÓ DE SOLO (${nodeId}).`);
+        const readings = snapshot.val();
+        if (readings) {
+          this.soilReadings = Object.values(readings);
+          this.updateChart();
+        } else {
+           console.warn(`Nenhum dado encontrado para o Nó de Solo (${nodeId}).`);
+        }
+      });
+    },
+
+    updateChart() {
+      console.log("--- Executando updateChart ---");
+
+      if (!this.soilReadings || !this.ambientReadings) {
+        console.log("Ainda aguardando dados de um dos nós. Status -> Solo:", this.soilReadings ? 'OK' : 'Faltando', "| Ambiente:", this.ambientReadings ? 'OK' : 'Faltando');
+        return; 
       }
-    });
+
+      console.log(`Dados recebidos! Comprimento original -> Solo: ${this.soilReadings.length}, Ambiente: ${this.ambientReadings.length}`);
+
+      const minLength = Math.min(this.soilReadings.length, this.ambientReadings.length);
+      console.log(`Tamanho sincronizado definido para: ${minLength}`);
+
+      if (minLength === 0) {
+        console.warn("Tamanho sincronizado é 0. Abortando atualização do gráfico.");
+        return;
+      }
+      
+      const syncedSoilReadings = this.soilReadings.slice(-minLength);
+      const syncedAmbientReadings = this.ambientReadings.slice(-minLength);
+
+      const lastSoilReading = syncedSoilReadings[syncedSoilReadings.length - 1];
+      const lastAmbientReading = syncedAmbientReadings[syncedAmbientReadings.length - 1];
+      
+      // Checagem de segurança para evitar erros
+      if (!lastSoilReading || typeof lastSoilReading.temperaturaSolo === 'undefined' || !lastAmbientReading || typeof lastAmbientReading.temperaturaAmbiente === 'undefined') {
+        console.error("ERRO: O último registro de dados está incompleto ou corrompido. Abortando.");
+        return;
+      }
+
+      this.Ground_Temperature = lastSoilReading.temperaturaSolo.toFixed(2);
+      this.Ground_Humidity = lastSoilReading.umidadeSolo.toFixed(2);
+      this.Air_Temperature = lastAmbientReading.temperaturaAmbiente.toFixed(2);
+      this.Air_Humidity = lastAmbientReading.umidadeAmbiente.toFixed(2);
+      
+      console.log("Cartões atualizados. Montando dados do gráfico...");
+
+      const newChartData = {
+        labels: syncedSoilReadings.map(r => new Date(r.timestamp).toLocaleTimeString('pt-BR')),
+        datasets: [
+          { ...this.chartData.datasets[0], data: syncedSoilReadings.map(r => r.temperaturaSolo) },
+          { ...this.chartData.datasets[1], data: syncedSoilReadings.map(r => r.umidadeSolo) },
+          { ...this.chartData.datasets[2], data: syncedAmbientReadings.map(r => r.temperaturaAmbiente) },
+          { ...this.chartData.datasets[3], data: syncedAmbientReadings.map(r => r.umidadeAmbiente) }
+        ]
+      };
+      
+      this.chartData = newChartData;
+      console.log(">>> SUCESSO: Objeto chartData foi atualizado e enviado para o Vue. O gráfico deve aparecer agora. <<<");
+    }
   },
-},
- 
-}
+};
 </script>
 
 <style scoped>
