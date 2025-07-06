@@ -2,10 +2,6 @@
     <div class="main">  
       <Header :Title="title" :subTitle="subtitle"/> 
         <div class="content">
-            <div class="air-humidity-stat">
-                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
-                    <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
-                </div>
           <div class="stats-container">
                 <div class="ground-temp-stat">                    
                     <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Válvula</p>
