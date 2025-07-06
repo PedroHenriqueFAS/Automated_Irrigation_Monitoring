@@ -195,7 +195,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Adicione esta linha */
+    flex-wrap: wrap; 
 }
 .ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
     display: flex;
@@ -264,7 +264,7 @@ export default {
     justify-content: center;
     height: 50vw;
     width: 100%;
-    margin-bottom: 1.5rem; /* <-- espaçamento após o gráfico */
+    margin-bottom: 1.5rem; 
 }
 
 }
