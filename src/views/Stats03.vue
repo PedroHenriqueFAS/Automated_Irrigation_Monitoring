@@ -3,232 +3,273 @@
       <Header :Title="title" :subTitle="subtitle"/> 
         <div class="content">
           <div class="stats-container">
-                <div class="ground-temp-stat">                    
-                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Válvula</p>
-                    <p class="ground-temp-stat-value">{{Ground_Temperature}} °C</p>
-                </div>
-
-                <div class="ground-humidity-stat">
-                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Fluxo</p>
-                    <p class="ground-humidity-stat-value">{{Ground_Humidity}} %</p>
-                </div>
-
                 <div class="air-temp-stat">
-                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura</p>
-                    <p class="air-temp-stat-value">{{ Air_Temperature }} °C</p>
+                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Ambiente</p>
+                    <p class="air-temp-stat-value">{{ Air_Temperaturee }} °C</p>
                 </div>
 
                 <div class="air-humidity-stat">
-                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade</p>
-                    <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Ambiente</p>
+                    <p class="air-humidity-stat-value">{{ Air_Humiditye }} %</p>
+                </div>
+          </div>
+          <div class="stats-container">
+                <div class="ground-temp-stat">                    
+                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Solo</p>
+                    <p class="ground-temp-stat-value">{{Ground_Temperaturee}} °C</p>
+                </div>
 
+                <div class="ground-humidity-stat">
+                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Solo</p>
+                    <p class="ground-humidity-stat-value">{{Ground_Humiditye}} %</p>
+                </div>
+
+                <div class="air-temp-stat">
+                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Fluxo</p>
+                    <p class="air-temp-stat-value">{{ flow }} m³/s</p>
+                </div>
+
+                <div class="air-humidity-stat">
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Vávula Solenoide</p>
+                    <p class="air-humidity-stat-value">{{ solenoid_valve }}</p>
                 </div>
           </div>
           <div class="graph-stats">
-              <Line :data="data" :options="options"  />
+              <Line :data="chartData" :options="chartOptions"  />
           </div>
           
         </div>
    </div>
 </template>
+
 <script>
-import Header from "../components/Header.vue"
-import { auth } from '../firebase/index.js'
-import { ref, onValue} from "firebase/database";
-import {db} from "@/firebase/index.js"
+import Header from "@/components/Header.vue";
+import { auth } from '../firebase/index.js';
+import { ref, onValue, query, orderByChild, limitToLast } from "firebase/database";
+import { db } from "@/firebase/index.js";
 
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  BarElement,
+  PointElement,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+} from 'chart.js';
+import { Line } from 'vue-chartjs';
+
+ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-} from 'chart.js'
-
-import { Bar } from 'vue-chartjs'
-import { Line } from 'vue-chartjs'
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
-  PointElement,
-  LineElement,)
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default {
-   components:{
-       Header,
-       Bar,
-       Line
-   },
-   
-   data(){
-        return{
-            title:"Pimentão",
-            subtitle: "Rua 3",
-            Stats_Vector:[15,16,17,18,19,19,16],
-            computed: {
-            myStyles () {
-                return {
-                    height: "50vh",
-                    width:"70vw"
-                }
-            },
-            
-            },
+  components: {
+    Header,
+    Line,
+  },
 
-            data: {
-            labels: ['Domingo','Segunda', 'Terça-Feira', 'Quarta-Feira','Quinta-Feira','Sexta-Feira','Sabado'],
-            datasets: [
-                { data: [25, 27, 24, 28, 27, 22, 25],
-                label:'Temperatura do Solo',
-                backgroundColor: 'rgba(255, 0, 0, 100)',
-                borderColor: 'rgba(255, 0, 0, 100)',
-                },
-                { data: [77, 65, 73, 71, 69, 67,70],
-                    label:'Umidade do Solo',
-                    backgroundColor: 'rgba(0, 255, 0, 100)',
-                    borderColor: 'rgba(0, 255, 0, 100)', 
-                },
-                { data: [25, 26, 28, 27, 24,26,25],
-                label:'Temperatura Ambiente',
-                backgroundColor: 'rgba(0, 0, 255, 100)',
-                borderColor: 'rgba(0, 0, 255, 100)'
-                },
-                { data: [68, 70, 49, 59, 60, 55, 50],
-                    label:'Umidade Ambiente',
-                    backgroundColor: 'rgba(0, 255, 255, 100)',
-                    borderColor: 'rgba(0, 255, 255, 100)', 
-                },
-                ],
-                
-            },
+  data() {
+    return {
+      title: "Pimentão",
+      subtitle: "Rua 2",
+      Ground_Temperaturee: "--",
+      Ground_Humiditye: "--",
+      Air_Temperaturee: "--",
+      Air_Humiditye: "--",
+      flow: "--",
+      solenoid_valve: "--",
+      soilReadings: null,
+      ambientReadings: null,
+      chartData: {
+        labels: [],
+        datasets: [
+          { label: 'Temperatura do Solo (°C)', data: [], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)' },
+          { label: 'Umidade do Solo', data: [], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)' },
+          { label: 'Temperatura Ambiente (°C)', data: [], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)' },
+          { label: 'Umidade Ambiente (%)', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)' }
+        ],
+      },
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    };
+  },
 
-            options: {
-                responsive: true,
-            },
-
-            Ground_Temperature:"19.32",
-            Ground_Humidity:"45",
-            Air_Temperature:"20.31",
-            Air_Humidity:"60",
-            Stats_Vector:[15,16,17,18,19,19,16],
-        }
-    },
-    mounted(){
-    this.getValues()
-    if(auth.currentUser){
-      console.log("logado")
-    }
-    
+  mounted() {
+    console.log("Componente montado. Iniciando ouvintes do Firebase...");
+    this.listenToAmbientNode();
+    this.listenToSoilNode('Node2');
   },
 
   methods: {
-  getValues() {
-    const dados = ref(db, 'UsersData/readings');
-    onValue(dados, (snapshot) => {
-      const readings = snapshot.val();
-      const lastReading = Object.values(readings).pop(); // Obtém a última leitura
+    listenToAmbientNode() {
+      const dbRef = ref(db, 'UsersData/Node4/readings');
+      const recentReadingsQuery = query(dbRef, orderByChild('timestamp'), limitToLast(20));
+      onValue(recentReadingsQuery, (snapshot) => {
+        console.log("Recebido callback do NÓ DE AMBIENTE (Node 4).");
+        const readings = snapshot.val();
+        if (readings) {
+          this.ambientReadings = Object.values(readings);
+          this.updateChart();
+        } else {
+          console.warn("Nenhum dado encontrado para o Nó de Ambiente.");
+        }
+      });
+    },
 
-      if (lastReading) {
-        this.Ground_Temperature = lastReading.soilTemp || 'N/A';
-        this.Ground_Humidity = Math.round((lastReading.moistureHum / 1024) * 100) || 'N/A';
-        this.Air_Temperature = lastReading.airTemp || 'N/A';
-        this.Air_Humidity = lastReading.airHum || 'N/A';
+    listenToSoilNode(nodeId) {
+      const dbRef = ref(db, `UsersData/${nodeId}/readings`);
+      const recentReadingsQuery = query(dbRef, orderByChild('timestamp'), limitToLast(20));
+      onValue(recentReadingsQuery, (snapshot) => {
+        console.log(`Recebido callback do NÓ DE SOLO (${nodeId}).`);
+        const readings = snapshot.val();
+        if (readings) {
+          this.soilReadings = Object.values(readings);
+          this.updateChart();
+        } else {
+           console.warn(`Nenhum dado encontrado para o Nó de Solo (${nodeId}).`);
+        }
+      });
+    },
+
+    updateChart() {
+      console.log("--- Executando updateChart ---");
+
+      if (!this.soilReadings || !this.ambientReadings) {
+        console.log("Ainda aguardando dados de um dos nós. Status -> Solo:", this.soilReadings ? 'OK' : 'Faltando', "| Ambiente:", this.ambientReadings ? 'OK' : 'Faltando');
+        return; 
       }
-    });
+
+      console.log(`Dados recebidos! Comprimento original -> Solo: ${this.soilReadings.length}, Ambiente: ${this.ambientReadings.length}`);
+
+      const minLength = Math.min(this.soilReadings.length, this.ambientReadings.length);
+      console.log(`Tamanho sincronizado definido para: ${minLength}`);
+
+      if (minLength === 0) {
+        console.warn("Tamanho sincronizado é 0. Abortando atualização do gráfico.");
+        return;
+      }
+      
+      const syncedSoilReadings = this.soilReadings.slice(-minLength);
+      const syncedAmbientReadings = this.ambientReadings.slice(-minLength);
+
+      const lastSoilReading = syncedSoilReadings[syncedSoilReadings.length - 1];
+      const lastAmbientReading = syncedAmbientReadings[syncedAmbientReadings.length - 1];
+      
+      // Checagem de segurança para evitar erros
+      if (!lastSoilReading || typeof lastSoilReading.temperaturaSolo === 'undefined' || !lastAmbientReading || typeof lastAmbientReading.temperaturaAmbiente === 'undefined') {
+        console.error("ERRO: O último registro de dados está incompleto ou corrompido. Abortando.");
+        return;
+      }
+
+      this.Ground_Temperature = lastSoilReading.temperaturaSolo.toFixed(2);
+      this.Ground_Humidity = lastSoilReading.umidadeSolo.toFixed(2);
+      this.Air_Temperature = lastAmbientReading.temperaturaAmbiente.toFixed(2);
+      this.Air_Humidity = lastAmbientReading.umidadeAmbiente.toFixed(2);
+      
+      console.log("Cartões atualizados. Montando dados do gráfico...");
+
+      const newChartData = {
+        labels: syncedSoilReadings.map(r => new Date(r.timestamp).toLocaleTimeString('pt-BR')),
+        datasets: [
+          { ...this.chartData.datasets[0], data: syncedSoilReadings.map(r => r.temperaturaSolo) },
+          { ...this.chartData.datasets[1], data: syncedSoilReadings.map(r => r.umidadeSolo) },
+          { ...this.chartData.datasets[2], data: syncedAmbientReadings.map(r => r.temperaturaAmbiente) },
+          { ...this.chartData.datasets[3], data: syncedAmbientReadings.map(r => r.umidadeAmbiente) }
+        ]
+      };
+      
+      this.chartData = newChartData;
+      console.log(">>> SUCESSO: Objeto chartData foi atualizado e enviado para o Vue. O gráfico deve aparecer agora. <<<");
+    }
   },
-},
- 
-}
+};
 </script>
 
 <style scoped>
-
-.content{
-    padding-top: 5vh;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+/* Define o layout principal da página */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem; /* Espaçamento entre a área dos cards e o gráfico */
+  padding: 2rem 1rem; /* Adiciona um respiro nas laterais */
 }
 
-.stats-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap; /* Adicione esta linha */
-}
-.ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch; /* Permite alinhar label à esquerda e valor à direita */
-    margin: 1rem;
-    background-color: #064B15;
-    border-radius: 40px;
-    width: 20vw;
-    height: 18vh;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    margin-bottom: 2rem
-}
-.ground-temp-stat-label,.air-temp-stat-label,.air-humidity-stat-label,.ground-humidity-stat-label{
-    font-size: 2vw;
-    margin: 0rem 1rem 0rem 1rem ;
-   
+.stats-container {
+  display: grid;
+  /* Cria colunas responsivas: no mínimo 180px, no máximo 1fr (ocupa o espaço disponível) */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem; /* Espaçamento perfeito entre os cards */
+  width: 100%;
+  max-width: 1200px; /* Limita a largura máxima para não esticar demais em telas grandes */
 }
 
-.air-temp-stat-label,.air-humidity-stat-label{
-    font-size: 2vw;
-    margin: 0rem 1rem 0rem 1rem;
-}
-.ground-temp-stat-value,.air-temp-stat-value,.air-humidity-stat-value,.ground-humidity-stat-value{
-    font-size: 2rem;
-    margin: 0rem ;
-    text-align: right;
-    max-width: 95%; /* Garante que o valor ocupe toda a largura do card */
-}
-
-.graph-stats{
-    display: flex;
-    justify-content: center;
-    height: 30vw;
-    width: 70vw;
-    margin-bottom: 3rem
+/* 2. O CARD AGORA É FLEXÍVEL */
+.ground-temp-stat, .air-temp-stat, .air-humidity-stat, .ground-humidity-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza o conteúdo verticalmente */
+  align-items: center;     /* Centraliza o conteúdo horizontalmente */
+  gap: 0.5rem; /* Um pequeno espaço entre o rótulo e o valor */
+  
+  background-color: #064B15;
+  color: #fff;
+  border-radius: 20px; /* Um raio mais sutil */
+  
+  /* REMOVEMOS 'width' e 'height' fixos. O Grid cuida da largura e o conteúdo da altura. */
+  padding: 1.5rem 1rem; /* Padding interno para o conteúdo respirar */
+  text-align: center;
 }
 
+/* 3. TIPOGRAFIA RESPONSIVA COM CLAMP() */
+.ground-temp-stat-label, .air-temp-stat-label, .air-humidity-stat-label, .ground-humidity-stat-label {
+  /* clamp(MÍNIMO, PREFERIDO, MÁXIMO) - a fonte se adapta à tela, mas nunca fica pequena ou grande demais. */
+  font-size: clamp(1.5rem, 2.5vw, 1rem); 
+  font-weight: 3000; /* Mais leve */
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ground-temp-stat-value, .air-temp-stat-value, .air-humidity-stat-value, .ground-humidity-stat-value {
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 4. O GRÁFICO TAMBÉM PODE SER MAIS SIMPLES */
+.graph-stats {
+  width: 100%;
+  max-width: 1200px;
+  /* A altura pode ser definida pela proporção com aspect-ratio */
+  aspect-ratio: 16 / 7; 
+  height: auto; /* Deixa o aspect-ratio controlar a altura */
+}
+
+/* 5. A MEDIA QUERY FICA MUITO MAIS SIMPLES */
 @media screen and (max-width: 600px) {
-.ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
-    margin:1rem 0.8rem 1rem 0.2rem;
-    width: 20vw;
-    height: 10vh;
-    border-radius: 20px;
+  .content {
+    padding: 1rem;
+    gap: 2rem;
+  }
+  
+  .stats-container {
+    gap: 1rem;
+  }
+  
+  .graph-stats {
+    aspect-ratio: 4 / 3; /* Gráfico mais "quadrado" no celular */
+  }
 }
-.ground-temp-stat-label,.air-temp-stat-label,.air-humidity-stat-label,.ground-humidity-stat-label{
-    font-size: 2.5vw;
-    padding: 0rem;
-    margin: 1rem 1rem 0rem 0rem;
-}
-
-.air-temp-stat-label,.air-humidity-stat-label{
-    font-size: 2.8vw;
-    padding: 0rem;
-    margin: 10rem 0rem 0rem 1rem;
-}
-.ground-temp-stat-value,.air-temp-stat-value,.air-humidity-stat-value,.ground-humidity-stat-value{
-    font-size: 1.25rem;
-    margin: 1px 1rem 1px 1px;
-}
-
-.graph-stats{
-    display: flex;
-    justify-content: center;
-    height: 50vw;
-    width: 100%;
-    margin-bottom: 1.5rem; /* <-- espaçamento após o gráfico */
-}
-
-}
-
 </style>
