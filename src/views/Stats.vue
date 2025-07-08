@@ -91,11 +91,11 @@ export default {
       chartData: {
         labels: [],
         datasets: [
-          { label: 'Temperatura do Solo (°C)', data: [], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 0.2)' },
-          { label: 'Umidade do Solo (%)', data: [], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 0.2)' },
-          { label: 'Temperatura Ambiente (°C)', data: [], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 0.2)' },
-          { label: 'Umidade Ambiente (%)', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)' },
-          { label: 'Fluxo (m³/s)', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 0.2)' }
+          { label: 'Temperatura do Solo (°C)', data: [], borderColor: 'rgba(255, 99, 132, 1)', backgroundColor: 'rgba(255, 99, 132, 1)' },
+          { label: 'Umidade do Solo (%)', data: [], borderColor: 'rgba(54, 162, 235, 1)', backgroundColor: 'rgba(54, 162, 235, 1)' },
+          { label: 'Temperatura Ambiente (°C)', data: [], borderColor: 'rgba(255, 206, 86, 1)', backgroundColor: 'rgba(255, 206, 86, 1)' },
+          { label: 'Umidade Ambiente (%)', data: [], borderColor: 'rgba(75, 192, 192, 1)', backgroundColor: 'rgba(75, 192, 192, 1)' },
+          { label: 'Fluxo (m³/s)', data: [], borderColor: 'rgba(153, 53, 153, 1)', backgroundColor: 'rgba(153, 53, 153, 1)' }
         ],
       },
       chartOptions: {
@@ -185,7 +185,10 @@ export default {
           { ...this.chartData.datasets[0], data: syncedSoilReadings.map(r => r.temperaturaSolo) },
           { ...this.chartData.datasets[1], data: syncedSoilReadings.map(r => r.umidadeSolo) },
           { ...this.chartData.datasets[2], data: syncedAmbientReadings.map(r => r.temperaturaAmbiente) },
-          { ...this.chartData.datasets[3], data: syncedAmbientReadings.map(r => r.umidadeAmbiente) }
+          { ...this.chartData.datasets[3], data: syncedAmbientReadings.map(r => r.umidadeAmbiente) },
+
+          // Para adicionar o fluxo e a válvula solenoide, você precisa garantir que esses dados estejam disponíveis nos registros.
+          { ...this.chartData.datasets[4], data: [] }
         ]
       };
       
@@ -261,7 +264,7 @@ export default {
 /* 5. A MEDIA QUERY FICA MUITO MAIS SIMPLES */
 @media screen and (max-width: 600px) {
   .content {
-    padding: 1rem;
+    padding: 0.5rem 2rem 2rem 1rem;
     gap: 2rem;
   }
   
