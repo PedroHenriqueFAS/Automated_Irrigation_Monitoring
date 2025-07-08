@@ -74,7 +74,7 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    /* flex: 1; */
 }
 
 .header-Title{
@@ -92,20 +92,24 @@ export default {
 }
 
 .back-button{
-    background-color: #fff;
-    display: flex;
-    padding: 1rem;
-    justify-content: center;
-    align-items: center;
-    color: #064B15;
-    right: 2rem; /* posiciona no canto direito */
-    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-    border-radius: 40px;
-    /* position: absolute; */
-    margin-left: 0; /* remova o margin-left */
-    border: none;
-    cursor: pointer;
-    white-space: nowrap; /* Impede que o texto "Voltar" quebre a linha */
+     /* 1. REATIVAMOS O POSITION: ABSOLUTE */
+ position: absolute; 
+ /* 2. POSICIONAMOS NA ESQUERDA */
+ left: 2rem; 
+ top: 50%;
+ transform: translateY(-50%); /* Truque para centralizar verticalmente */
+
+ background-color: #fff;
+ display: flex;
+ padding: 0.5rem 1.5rem;
+ justify-content: center;
+ align-items: center;
+ color: #064B15;
+ font-size: clamp(0.9rem, 2.5vw, 1rem);
+ border-radius: 40px;
+ border: none;
+ cursor: pointer;
+ white-space: nowrap;
 }
     
 @media screen and (max-width: 600px) {
@@ -114,13 +118,13 @@ export default {
     background-color: #064B15;
     width: 100%;
     height: auto;
-    margin-bottom: 2rem;
+    margin-bottom: 20%;
 }
 .header-Title{
-    font-size: clamp(1.8rem, 5vw, 2.2rem);
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
 }
 .back-button{
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 0.5rem;
     font-size: 0.9rem;
 }
 
