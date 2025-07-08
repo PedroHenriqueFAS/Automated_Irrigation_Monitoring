@@ -1,15 +1,15 @@
 <template>
     <div class="header-Main">
-        <div class="menu-container">
+        <!-- <div class="menu-container">
             <button class="menu-btn" @click="gotoApresentation()"><i class="fa-solid fa-person-chalkboard"></i> Apresentação</button>
             <button class="menu-btn" @click="gotoCatalogSheet()"><i class="fa-solid fa-clipboard"></i> Ficha Catalográfica</button>
             <button class="menu-btn" @click="gotoSource()"><i class="fa-solid fa-magnifying-glass"></i> Fontes</button>
-        </div>
+        </div> -->
+        <button class="back-button" @click="goBack()">Voltar</button>
         <div class="header-title-container">
             <p class="header-Title">{{Title}}</p>
             <p class="header-SubTitle" v-if="subTitle">{{ subTitle }}</p>
         </div>
-        <button class="back-button" @click="goBack()">Voltar</button>
     </div>
 </template>
 
@@ -66,7 +66,8 @@ export default {
     align-items: center;
     padding: 0;
     position: relative; /* Adicione esta linha */
-    /* border-radius: 0px 0px 40px 40px;  */
+    padding: 1rem 2rem; 
+    box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
 }
 .header-title-container {
     display: flex;
@@ -77,13 +78,13 @@ export default {
 }
 
 .header-Title{
-    font-size: 8vh;
+    font-size: clamp(2rem, 5vw, 3rem);
     color: #fff;
     margin:0rem;
 }
 
 .header-SubTitle {
-  font-size: 2.5vh;
+  font-size: clamp(1rem, 3vw, 1.25rem);
   color: #fff;
   margin-top: 0.5rem;
   text-align: center;
@@ -98,12 +99,13 @@ export default {
     align-items: center;
     color: #064B15;
     right: 2rem; /* posiciona no canto direito */
-    font-size: 3rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     border-radius: 40px;
-    position: absolute;
+    /* position: absolute; */
     margin-left: 0; /* remova o margin-left */
-    top: 50%;
-    transform: translateY(-50%);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap; /* Impede que o texto "Voltar" quebre a linha */
 }
     
 @media screen and (max-width: 600px) {
@@ -111,19 +113,15 @@ export default {
 .header-Main{
     background-color: #064B15;
     width: 100%;
-    height: 15vh;
-    /* border-radius: 0px 0px 40px 40px;  */
+    height: auto;
+    margin-bottom: 2rem;
 }
 .header-Title{
-    font-size: 4vh;
-    margin:0rem;
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
 }
 .back-button{
-    display: flex;
-    padding: 1rem;
-    /* margin-left: 75vw; */
-    font-size: 1rem;
-    border-radius: 40px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
 }
 
 }
