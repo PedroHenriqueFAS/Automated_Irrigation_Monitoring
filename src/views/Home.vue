@@ -55,62 +55,98 @@ export default {
 </script>
 
 <style scoped>
-
-.fa-gear{
-    width: auto;
-    height: auto;
-}
-.plant-button-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: fit-content;
-}
-.plant-button{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #064B15;
-    width: 15vw;
-    height: 10vh;
-    font-size: 3vw;
-    border-radius: 40px;
-    margin: 8vh 1rem 8vh 10vh;
-    color: #fff;
-}
-.plant-config-button{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    background-color: #064B15;
-    border-radius: 100%;
-    margin-left: 0px;
-    width: 3vw;
-    height: 3vw;
-
+/* --- ESTILOS GERAIS (DESKTOP) --- */
+.fa-gear {
+  width: auto;
+  height: auto;
 }
 
-.content{
-    display: flex;
-    justify-content: flex-start;
+.content {
+  display: flex;
+  /* ALTERADO: Voltamos para 'center' para alinhar o bloco todo com o título */
+  justify-content: center; 
+  align-items: center;
+  padding: 0 2rem;
 }
 
+.plant-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  /* ALTERADO: Adicionamos margem lateral para criar espaço entre os botões */
+  margin: 0 4vw; 
+}
+
+.plant-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #064B15;
+  color: #fff;
+  width: 15vw;
+  height: 10vh;
+  font-size: 2.5vw;
+  border-radius: 40px;
+  margin: 3rem 0;
+  border: none;
+  cursor: pointer;
+}
+
+.plant-config-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  background-color: #064B15;
+  border-radius: 100%;
+  margin-left: 1rem;
+  width: 3vw;
+  height: 3vw;
+  border: none;
+  cursor: pointer;
+}
+
+/* ======================================================= */
+/* --- AJUSTES PARA TELAS MENORES (CELULARES) --- */
+/* ======================================================= */
 @media screen and (max-width: 600px) {
-.plant-button{ 
-    width: 25vw;
-    height: 10vh;
-    font-size: 4vw;
-    margin: 4vh 1rem 4vh 8vh;
-}
-.plant-config-button{
-    border-radius: 100%;
-    margin-left: 0px;
-    width: 8vw;
-    height: 8vw
-}
+  .content {
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    gap: 2rem;
+    margin: 0; /* Reseta a margem para o mobile */
+  }
 
+  .plant-button-container {
+    width: 100%;
+    max-width: 400px;
+    justify-content: space-between;
+    margin: 0; /* Reseta a margem para o mobile */
+  }
 
+  .plant-button {
+    margin: 0; 
+    width: 80%;
+    height: 9vh;
+    font-size: 5vw;
+  }
+
+  .plant-config-button {
+    margin: 0;
+    width: 15%;
+    height: 0;
+    padding-bottom: 15%;
+    position: relative;
+  }
+  
+  .plant-config-button .fa-gear {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5vw;
+  }
 }
-    
 </style>
