@@ -3,16 +3,6 @@
       <Header :Title="title" :subTitle="subtitle"/> 
         <div class="content">
           <div class="stats-container">
-                  <div class="ground-temp-stat">                    
-                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Solo</p>
-                    <p class="ground-temp-stat-value">{{Ground_Temperature}} °C</p>
-                </div>
-
-                <div class="ground-humidity-stat">
-                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Solo</p>
-                    <p class="ground-humidity-stat-value">{{Ground_Humidity}} %</p>
-                </div>
-
                 <div class="air-temp-stat">
                     <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Ambiente</p>
                     <p class="air-temp-stat-value">{{ Air_Temperature }} °C</p>
@@ -23,6 +13,27 @@
                     <p class="air-humidity-stat-value">{{ Air_Humidity }} %</p>
                 </div>
           </div>
+          <div class="stats-container">
+                <div class="ground-temp-stat">                    
+                    <p class="ground-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Temperatura Solo</p>
+                    <p class="ground-temp-stat-value">{{Ground_Temperature}} °C</p>
+                </div>
+
+                <div class="ground-humidity-stat">
+                    <p class="ground-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Umidade Solo</p>
+                    <p class="ground-humidity-stat-value">{{Ground_Humidity}} %</p>
+                </div>
+
+                <div class="air-temp-stat">
+                    <p class="air-temp-stat-label"><font-awesome-icon icon="fa-solid fa-temperature-high" />&nbsp;Fluxo</p>
+                    <p class="air-temp-stat-value">{{ flow }} m³/s</p>
+                </div>
+
+                <div class="air-humidity-stat">
+                    <p class="air-humidity-stat-label"><font-awesome-icon icon="fa-solid fa-droplet" />&nbsp;Vávula Solenoide</p>
+                    <p class="air-humidity-stat-value">{{ solenoid_valve }}</p>
+                </div>
+          </div>
           <div class="graph-stats">
               <Line :data="chartData" :options="chartOptions"  />
           </div>
@@ -30,12 +41,12 @@
         </div>
    </div>
 </template>
-<script>
 
-import Header from "../components/Header.vue"
-import { auth } from '../firebase/index.js'
+<script>
+import Header from "@/components/Header.vue";
+import { auth } from '../firebase/index.js';
 import { ref, onValue, query, orderByChild, limitToLast } from "firebase/database";
-import { db } from "@/firebase/index.js"
+import { db } from "@/firebase/index.js";
 
 import {
   Chart as ChartJS,
@@ -46,8 +57,8 @@ import {
   LineElement,
   CategoryScale,
   LinearScale,
-} from 'chart.js'
-import { Line } from 'vue-chartjs'
+} from 'chart.js';
+import { Line } from 'vue-chartjs';
 
 ChartJS.register(
   CategoryScale,
@@ -57,22 +68,24 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
-)
+);
 
 export default {
   components: {
     Header,
-    Line
+    Line,
   },
 
   data() {
     return {
       title: "Pimentão",
-      subtitle: "Rua 2", 
-Ground_Temperature: "--",
+      subtitle: "Rua 2",
+      Ground_Temperature: "--",
       Ground_Humidity: "--",
       Air_Temperature: "--",
       Air_Humidity: "--",
+      flow: "--",
+      solenoid_valve: "--",
       soilReadings: null,
       ambientReadings: null,
       chartData: {
@@ -183,90 +196,80 @@ Ground_Temperature: "--",
 </script>
 
 <style scoped>
-
-.content{
-    padding-top: 5vh;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+/* Define o layout principal da página */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem; /* Espaçamento entre a área dos cards e o gráfico */
+  padding: 2rem 1rem; /* Adiciona um respiro nas laterais */
 }
 
-.stats-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap; 
-}
-.ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch; /* Permite alinhar label à esquerda e valor à direita */
-    margin: 1rem;
-    background-color: #064B15;
-    border-radius: 40px;
-    width: 20vw;
-    height: 18vh;
-    color: #fff;
-    padding: 0.5rem 1rem;
-    margin-bottom: 2rem
-}
-.ground-temp-stat-label,.air-temp-stat-label,.air-humidity-stat-label,.ground-humidity-stat-label{
-    font-size: 2vw;
-    margin: 0rem 1rem 0rem 1rem ;
-   
+.stats-container {
+  display: grid;
+  /* Cria colunas responsivas: no mínimo 180px, no máximo 1fr (ocupa o espaço disponível) */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem; /* Espaçamento perfeito entre os cards */
+  width: 100%;
+  max-width: 1200px; /* Limita a largura máxima para não esticar demais em telas grandes */
 }
 
-.air-temp-stat-label,.air-humidity-stat-label{
-    font-size: 2vw;
-    margin: 0rem 1rem 0rem 1rem;
-}
-.ground-temp-stat-value,.air-temp-stat-value,.air-humidity-stat-value,.ground-humidity-stat-value{
-    font-size: 2rem;
-    margin: 0rem ;
-    text-align: right;
-    max-width: 95%; 
-}
-
-.graph-stats{
-    display: flex;
-    justify-content: center;
-    height: 30vw;
-    width: 70vw;
-    margin-bottom: 3rem
+/* 2. O CARD AGORA É FLEXÍVEL */
+.ground-temp-stat, .air-temp-stat, .air-humidity-stat, .ground-humidity-stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza o conteúdo verticalmente */
+  align-items: center;     /* Centraliza o conteúdo horizontalmente */
+  gap: 0.5rem; /* Um pequeno espaço entre o rótulo e o valor */
+  
+  background-color: #064B15;
+  color: #fff;
+  border-radius: 20px; /* Um raio mais sutil */
+  
+  /* REMOVEMOS 'width' e 'height' fixos. O Grid cuida da largura e o conteúdo da altura. */
+  padding: 1.5rem 1rem; /* Padding interno para o conteúdo respirar */
+  text-align: center;
 }
 
+/* 3. TIPOGRAFIA RESPONSIVA COM CLAMP() */
+.ground-temp-stat-label, .air-temp-stat-label, .air-humidity-stat-label, .ground-humidity-stat-label {
+  /* clamp(MÍNIMO, PREFERIDO, MÁXIMO) - a fonte se adapta à tela, mas nunca fica pequena ou grande demais. */
+  font-size: clamp(1.5rem, 2.5vw, 1rem); 
+  font-weight: 3000; /* Mais leve */
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ground-temp-stat-value, .air-temp-stat-value, .air-humidity-stat-value, .ground-humidity-stat-value {
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  font-weight: bold;
+  margin: 0;
+}
+
+/* 4. O GRÁFICO TAMBÉM PODE SER MAIS SIMPLES */
+.graph-stats {
+  width: 100%;
+  max-width: 1200px;
+  /* A altura pode ser definida pela proporção com aspect-ratio */
+  aspect-ratio: 16 / 7; 
+  height: auto; /* Deixa o aspect-ratio controlar a altura */
+}
+
+/* 5. A MEDIA QUERY FICA MUITO MAIS SIMPLES */
 @media screen and (max-width: 600px) {
-.ground-temp-stat,.air-temp-stat,.air-humidity-stat,.ground-humidity-stat{
-    margin:1rem 0.8rem 1rem 0.2rem;
-    width: 20vw;
-    height: 10vh;
-    border-radius: 20px;
+  .content {
+    padding: 1rem;
+    gap: 2rem;
+  }
+  
+  .stats-container {
+    gap: 1rem;
+  }
+  
+  .graph-stats {
+    aspect-ratio: 4 / 3; /* Gráfico mais "quadrado" no celular */
+  }
 }
-.ground-temp-stat-label,.air-temp-stat-label,.air-humidity-stat-label,.ground-humidity-stat-label{
-    font-size: 2.5vw;
-    padding: 0rem;
-    margin: 1rem 1rem 0rem 0rem;
-}
-
-.air-temp-stat-label,.air-humidity-stat-label{
-    font-size: 2.8vw;
-    padding: 0rem;
-    margin: 10rem 0rem 0rem 1rem;
-}
-.ground-temp-stat-value,.air-temp-stat-value,.air-humidity-stat-value,.ground-humidity-stat-value{
-    font-size: 1.25rem;
-    margin: 1px 1rem 1px 1px;
-}
-
-.graph-stats{
-    display: flex;
-    justify-content: center;
-    height: 50vw;
-    width: 100%;
-    margin-bottom: 1.5rem; 
-}
-
-}
-
 </style>
