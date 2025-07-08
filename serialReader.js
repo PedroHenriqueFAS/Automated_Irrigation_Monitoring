@@ -10,23 +10,23 @@ const porta = new SerialPort({
   baudRate: 9600,
 });
 
-// ADICIONADO: Lista de nós que esperamos receber em cada rodada
+// Lista de nós que esperamos receber em cada rodada
 const EXPECTED_NODES = ['2', '3', '4'];
 
-// ADICIONADO: Objeto para guardar os dados da rodada atual (nosso "buffer")
+// Objeto para guardar os dados da rodada atual (nosso "buffer")
 let dataBatch = {};
 
-// ADICIONADO: Flag para controlar o período de espera
+// Flag para controlar o período de espera
 let isOnCooldown = false;
 
-// ADICIONADO: Intervalo de espera em milissegundos (1 minuto)
+// Intervalo de espera em milissegundos (1 minuto)
 const COOLDOWN_PERIOD = 60 * 1000;
 
 const myserialparser = porta.pipe(new DelimiterParser({ delimiter: '\n' }));
 
 // --- Funções Auxiliares ---
 
-// ADICIONADO: Função para enviar a rodada completa para o Firebase
+// Função para enviar a rodada completa para o Firebase
 function sendBatchToFirebase() {
   console.log('--- Rodada completa! Enviando dados para o Firebase... ---');
   
